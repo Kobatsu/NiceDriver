@@ -1,11 +1,15 @@
 <resources>
     <string name="app_name">NiceDriver</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_maps">Map</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_settings">Settings</string>
     <string name="title_path">Paths</string>
+
+    <string name="hello_settings_fragment">Settings Fragment [TODO]</string>
+    <string name="search_last_path_hint">Search…</string>
+    <string name="search_map_hint">Trajet, lieu, adresse…</string>
+    <string name="access_location_needed">Autorisation d\'accès à la location de l\'appareil nécessaire</string>
 </resources>

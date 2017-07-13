@@ -7,8 +7,8 @@ android {
         applicationId "com.nsy209.nicedriver"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -31,4 +31,13 @@ dependencies {
     implementation 'com.android.support:design:25.4.0'
     implementation 'com.google.android.gms:play-services-maps:10.2.1'
     implementation 'com.android.support:support-vector-drawable:25.4.0'
+
+    //Butterknife
+    implementation 'com.jakewharton:butterknife:8.7.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
+    implementation 'com.android.support:support-v4:25.4.0'
+
+    //Floating SearchView https://github.com/arimorty/floatingsearchview
+    compile 'com.github.arimorty:floatingsearchview:2.1.1'
+
 }
