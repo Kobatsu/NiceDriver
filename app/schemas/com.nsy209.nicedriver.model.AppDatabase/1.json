@@ -1,0 +1,307 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "9f7994229d2e0dfad0637d5162e7e271",
+    "entities": [
+      {
+        "tableName": "Cars",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `name` TEXT, `make` TEXT, `model` TEXT, `year` INTEGER, `numberPlate` TEXT, `deviceId` TEXT, `cardbId` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, `userId` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mMake",
+            "columnName": "make",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mModel",
+            "columnName": "model",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mYear",
+            "columnName": "year",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mNumberPlate",
+            "columnName": "numberPlate",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mDeviceId",
+            "columnName": "deviceId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mCardbId",
+            "columnName": "cardbId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mCreationDate",
+            "columnName": "creationDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mLastUpdateDate",
+            "columnName": "lastUpdateDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mUserId",
+            "columnName": "userId",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Markers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `image` BLOB, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mImage",
+            "columnName": "image",
+            "affinity": "BLOB"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Points",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `latitude` REAL, `longitude` REAL, `name` TEXT, `value` TEXT, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mLatitude",
+            "columnName": "latitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "mLongitude",
+            "columnName": "longitude",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "value",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Referentiels",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `name` TEXT, `value` REAL, `color` TEXT, `idMarker` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "value",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "mColor",
+            "columnName": "color",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mIdMarker",
+            "columnName": "idMarker",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Trips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `idBeginLocation` INTEGER, `idEndLocation` INTEGER, `startDate` INTEGER, `endDate` INTEGER, `stopDate` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mIdBeginLocation",
+            "columnName": "idBeginLocation",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mIdEndLocation",
+            "columnName": "idEndLocation",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mStartDate",
+            "columnName": "startDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mEndDate",
+            "columnName": "endDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mStopDate",
+            "columnName": "stopDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mCreationDate",
+            "columnName": "creationDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mLastUpdateDate",
+            "columnName": "lastUpdateDate",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `role` TEXT, `firstName` TEXT, `lastName` TEXT, `nickName` TEXT, `gender` TEXT, `isLocationEnabled` INTEGER, `birthDate` INTEGER, `licenseDeliveryDate` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mRole",
+            "columnName": "role",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mFirstName",
+            "columnName": "firstName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mLastName",
+            "columnName": "lastName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mNickName",
+            "columnName": "nickName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mGender",
+            "columnName": "gender",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "mIsLocationEnabled",
+            "columnName": "isLocationEnabled",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mBirthDate",
+            "columnName": "birthDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mLicenseDeliveryDate",
+            "columnName": "licenseDeliveryDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mCreationDate",
+            "columnName": "creationDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "mLastUpdateDate",
+            "columnName": "lastUpdateDate",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9f7994229d2e0dfad0637d5162e7e271\")"
+    ]
+  }
+}

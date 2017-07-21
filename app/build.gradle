@@ -7,10 +7,17 @@ android {
         applicationId "com.nsy209.nicedriver"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 2
-        versionName "0.1.0"
+        versionCode 3
+        versionName "0.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation":
+                                     "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -39,5 +46,9 @@ dependencies {
 
     //Floating SearchView https://github.com/arimorty/floatingsearchview
     compile 'com.github.arimorty:floatingsearchview:2.1.1'
+
+    //ORM
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha5"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha5"
 
 }
