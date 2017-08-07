@@ -34,7 +34,8 @@ public class MapFragment extends Fragment {
 
     public static final int REQUEST_LOCATION = 1230;
     private Unbinder unbinder;
-    @BindView(R.id.mapView) MapView mMapView;
+    @BindView(R.id.mapView)
+    MapView mMapView;
     private GoogleMap googleMap;
 
     public MapFragment() {
@@ -152,7 +153,6 @@ public class MapFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mMapView.onDestroy();
     }
 
     @Override
@@ -163,7 +163,8 @@ public class MapFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        mMapView.onDestroy();
         unbinder.unbind();
+        super.onDestroyView();
     }
 }

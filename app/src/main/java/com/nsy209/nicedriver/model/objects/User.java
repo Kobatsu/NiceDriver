@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 
 import java.util.Date;
 
+import static com.xee.api.entity.User.Gender.MALE;
+
 /**
  * Created by Sébastien on 21/07/2017.
  */
@@ -121,5 +123,21 @@ public class User {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         mLastUpdateDate = lastUpdateDate;
+    }
+
+    public static User convertFromXee(com.xee.api.entity.User user) {
+        User u = new User();
+        u.setBirthDate(user.getBirthDate());
+        u.setCreationDate(user.getCreationDate());
+        u.setFirstName(user.getFirstName());
+        u.setGender(user.getGender() == MALE ? "male" : "female");
+        u.setId(Integer.parseInt(user.getId()));
+        u.setIsLocationEnabled(user.isLocationEnabled());
+        u.setLastName(user.getLastName());
+        u.setLastUpdateDate(user.getLastUpdateDate());
+        u.setLicenseDeliveryDate(user.getLicenceDeliveryDate());
+        u.setNickName(user.getNickName());
+        u.setRole(user.getRole());
+        return u;
     }
 }

@@ -13,9 +13,13 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nsy209.nicedriver.R;
+import com.nsy209.nicedriver.model.AppDatabase;
 import com.nsy209.nicedriver.ui.fragments.ListPathFragment;
 import com.nsy209.nicedriver.ui.fragments.MapFragment;
 import com.nsy209.nicedriver.ui.fragments.SettingsFragment;
+import com.xee.api.Xee;
+import com.xee.core.XeeEnv;
+import com.xee.core.entity.OAuth2Client;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int FRAGMENT_MAP = 0;
     private static final int FRAGMENT_LIST = 1;
     private static final int FRAGMENT_SETTINGS = 2;
+    private static final String TAG = MainActivity.class.getName().substring(MainActivity.class.getName().lastIndexOf("."));
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -54,11 +59,13 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPagerAdapter mViewPagerAdapter;
     private MenuItem mPrevMenuItem;
+    private Xee mXeeApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         ButterKnife.bind(this);
         mBottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -87,6 +94,23 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        initXee();
+    }
+
+    private void initXee() {
+        XeeEnv xeeEnv = new XeeEnv(this,
+                new OAuth2Client("gQkYPQj7BrL11P1i9vms",
+                        "41HO4u9scRp2gI8UgRTL",
+                        "http://localhost"),
+                60, 60, XeeEnv.SANDBOX);
+        mXeeApi = new Xee(xeeEnv);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AppDatabase.exportDatabase(this);
     }
 
     @Override
@@ -106,6 +130,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public Xee getXeeApi() {
+        return mXeeApi;
+    }
+
     /**
      * A simple pager adapter that represents 3 fragments corresponding to each button of the
      * bottomNavigationView
@@ -123,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 case FRAGMENT_LIST:
                     return ListPathFragment.newInstance();
                 case FRAGMENT_SETTINGS:
-                    return SettingsFragment.newInstance("", "");
+                    return SettingsFragment.newInstance();
             }
             return null;
         }

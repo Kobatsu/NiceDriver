@@ -6,6 +6,8 @@ import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Created by Sébastien on 21/07/2017.
+ *
+ * Check https://stackoverflow.com/questions/34588905/how-to-load-image-through-byte-array-using-glide
  */
 @Entity(tableName = "Markers")
 public class Marker {
