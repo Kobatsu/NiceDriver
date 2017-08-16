@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.nsy209.nicedriver.R;
-import com.nsy209.nicedriver.model.AppDatabase;
 import com.nsy209.nicedriver.ui.fragments.ListPathFragment;
 import com.nsy209.nicedriver.ui.fragments.MapFragment;
 import com.nsy209.nicedriver.ui.fragments.SettingsFragment;
@@ -100,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initXee() {
         XeeEnv xeeEnv = new XeeEnv(this,
-                new OAuth2Client("gQkYPQj7BrL11P1i9vms",
-                        "41HO4u9scRp2gI8UgRTL",
+                new OAuth2Client("tpziqAm4itmcCUlc6azs",
+                        "TH2tFMi0KTXSyBUBGvJ9",
                         "http://localhost"),
                 60, 60, XeeEnv.SANDBOX);
         mXeeApi = new Xee(xeeEnv);
@@ -110,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        AppDatabase.exportDatabase(this);
     }
 
     @Override

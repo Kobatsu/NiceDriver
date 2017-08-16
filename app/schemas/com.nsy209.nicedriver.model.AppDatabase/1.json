@@ -2,66 +2,77 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9f7994229d2e0dfad0637d5162e7e271",
+    "identityHash": "8fb1c1156a658e04120b4af39ab1ee77",
     "entities": [
       {
         "tableName": "Cars",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `name` TEXT, `make` TEXT, `model` TEXT, `year` INTEGER, `numberPlate` TEXT, `deviceId` TEXT, `cardbId` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, `userId` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT, `make` TEXT, `model` TEXT, `year` INTEGER NOT NULL, `numberPlate` TEXT, `deviceId` TEXT, `cardbId` INTEGER NOT NULL, `creationDate` INTEGER, `lastUpdateDate` INTEGER, `userId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "mId",
             "columnName": "id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "mName",
             "columnName": "name",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "mMake",
             "columnName": "make",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "mModel",
             "columnName": "model",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "mYear",
             "columnName": "year",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "mNumberPlate",
             "columnName": "numberPlate",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "mDeviceId",
             "columnName": "deviceId",
-            "affinity": "TEXT"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "mCardbId",
             "columnName": "cardbId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "mCreationDate",
             "columnName": "creationDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mLastUpdateDate",
             "columnName": "lastUpdateDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mUserId",
             "columnName": "userId",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -75,95 +86,19 @@
       },
       {
         "tableName": "Markers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `image` BLOB, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `image` BLOB, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "mId",
             "columnName": "id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "mImage",
             "columnName": "image",
-            "affinity": "BLOB"
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "Points",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `latitude` REAL, `longitude` REAL, `name` TEXT, `value` TEXT, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "mId",
-            "columnName": "id",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mLatitude",
-            "columnName": "latitude",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "mLongitude",
-            "columnName": "longitude",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "mName",
-            "columnName": "name",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "mValue",
-            "columnName": "value",
-            "affinity": "TEXT"
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "Referentiels",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `name` TEXT, `value` REAL, `color` TEXT, `idMarker` INTEGER, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "mId",
-            "columnName": "id",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mName",
-            "columnName": "name",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "mValue",
-            "columnName": "value",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "mColor",
-            "columnName": "color",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "mIdMarker",
-            "columnName": "idMarker",
-            "affinity": "INTEGER"
+            "affinity": "BLOB",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -177,47 +112,121 @@
       },
       {
         "tableName": "Trips",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `idBeginLocation` INTEGER, `idEndLocation` INTEGER, `startDate` INTEGER, `endDate` INTEGER, `stopDate` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT, `pointBeginLatitude` REAL NOT NULL, `pointBeginLongitude` REAL NOT NULL, `pointBeginAltitude` REAL NOT NULL, `pointBeginHeading` REAL NOT NULL, `pointBeginSatellites` INTEGER NOT NULL, `pointBeginDate` INTEGER, `pointEndLatitude` REAL NOT NULL, `pointEndLongitude` REAL NOT NULL, `pointEndAltitude` REAL NOT NULL, `pointEndHeading` REAL NOT NULL, `pointEndSatellites` INTEGER NOT NULL, `pointEndDate` INTEGER, `beginDate` INTEGER, `endDate` INTEGER, `stopDate` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, `isSent` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "mId",
             "columnName": "id",
-            "affinity": "INTEGER"
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
-            "fieldPath": "mIdBeginLocation",
-            "columnName": "idBeginLocation",
-            "affinity": "INTEGER"
+            "fieldPath": "mPointBeginLatitude",
+            "columnName": "pointBeginLatitude",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mIdEndLocation",
-            "columnName": "idEndLocation",
-            "affinity": "INTEGER"
+            "fieldPath": "mPointBeginLongitude",
+            "columnName": "pointBeginLongitude",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mStartDate",
-            "columnName": "startDate",
-            "affinity": "INTEGER"
+            "fieldPath": "mPointBeginAltitude",
+            "columnName": "pointBeginAltitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointBeginHeading",
+            "columnName": "pointBeginHeading",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointBeginSatellites",
+            "columnName": "pointBeginSatellites",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointBeginDate",
+            "columnName": "pointBeginDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPointEndLatitude",
+            "columnName": "pointEndLatitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointEndLongitude",
+            "columnName": "pointEndLongitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointEndAltitude",
+            "columnName": "pointEndAltitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointEndHeading",
+            "columnName": "pointEndHeading",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointEndSatellites",
+            "columnName": "pointEndSatellites",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPointEndDate",
+            "columnName": "pointEndDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mBeginDate",
+            "columnName": "beginDate",
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mEndDate",
             "columnName": "endDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mStopDate",
             "columnName": "stopDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mCreationDate",
             "columnName": "creationDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
           },
           {
             "fieldPath": "mLastUpdateDate",
             "columnName": "lastUpdateDate",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIsSent",
+            "columnName": "isSent",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -230,68 +239,88 @@
         "foreignKeys": []
       },
       {
-        "tableName": "Users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `role` TEXT, `firstName` TEXT, `lastName` TEXT, `nickName` TEXT, `gender` TEXT, `isLocationEnabled` INTEGER, `birthDate` INTEGER, `licenseDeliveryDate` INTEGER, `creationDate` INTEGER, `lastUpdateDate` INTEGER, PRIMARY KEY(`id`))",
+        "tableName": "Locations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `altitude` REAL NOT NULL, `heading` REAL NOT NULL, `satellites` INTEGER NOT NULL, `date` INTEGER, PRIMARY KEY(`latitude`, `longitude`, `altitude`, `heading`, `satellites`, `date`))",
         "fields": [
           {
-            "fieldPath": "mId",
-            "columnName": "id",
-            "affinity": "INTEGER"
+            "fieldPath": "mLatitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mRole",
-            "columnName": "role",
-            "affinity": "TEXT"
+            "fieldPath": "mLongitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mFirstName",
-            "columnName": "firstName",
-            "affinity": "TEXT"
+            "fieldPath": "mAltitude",
+            "columnName": "altitude",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mLastName",
-            "columnName": "lastName",
-            "affinity": "TEXT"
+            "fieldPath": "mHeading",
+            "columnName": "heading",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
-            "fieldPath": "mNickName",
-            "columnName": "nickName",
-            "affinity": "TEXT"
+            "fieldPath": "mSatellites",
+            "columnName": "satellites",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
-            "fieldPath": "mGender",
-            "columnName": "gender",
-            "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "mIsLocationEnabled",
-            "columnName": "isLocationEnabled",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mBirthDate",
-            "columnName": "birthDate",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mLicenseDeliveryDate",
-            "columnName": "licenseDeliveryDate",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mCreationDate",
-            "columnName": "creationDate",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "mLastUpdateDate",
-            "columnName": "lastUpdateDate",
-            "affinity": "INTEGER"
+            "fieldPath": "mDate",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "latitude",
+            "longitude",
+            "altitude",
+            "heading",
+            "satellites",
+            "date"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Signals",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`date` INTEGER, `value` REAL NOT NULL, `name` TEXT, PRIMARY KEY(`date`, `value`, `name`))",
+        "fields": [
+          {
+            "fieldPath": "mDate",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "date",
+            "value",
+            "name"
           ],
           "autoGenerate": false
         },
@@ -301,7 +330,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9f7994229d2e0dfad0637d5162e7e271\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"8fb1c1156a658e04120b4af39ab1ee77\")"
     ]
   }
 }

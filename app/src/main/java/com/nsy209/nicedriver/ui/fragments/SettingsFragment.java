@@ -14,9 +14,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.nsy209.nicedriver.R;
+import com.nsy209.nicedriver.model.AppDatabase;
+import com.nsy209.nicedriver.model.objects.Location;
+import com.nsy209.nicedriver.model.objects.Signal;
 import com.nsy209.nicedriver.ui.activities.MainActivity;
 import com.nsy209.nicedriver.utils.JSonLogger;
 import com.xee.api.Xee;
+import com.xee.api.entity.Car;
 import com.xee.api.entity.User;
 import com.xee.auth.ConnectionCallback;
 import com.xee.auth.SignInButton;
@@ -77,11 +81,39 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText(getContext(), "You are connected, bravo !", Toast.LENGTH_SHORT).show();
                 final Xee xee = ((MainActivity) getActivity()).getXeeApi();
                 xee.connect(new ConnectionCallback() {
-
                     public void onSuccess() {
                         // once here, the SDK is initialized and ready to be used
                         Log.d("Xee", "Connection OK");
+                        //debug purpose
                         new GetUserTask().execute();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // SANDBOX prend pas en compte l'authentification : toutes les urls avec users/me/ sont pas utilisables.
+                                // On peut pas récup le car d'un user du coup on le récupere direct via l'id du car (mais du coup on a déjà l'id dont on a besoin, un peu stupide)
+//                                ((MainActivity) getActivity()).getXeeApi().getCars();
+                                try {
+                                    // Cette partie devrait marcher mais ça renvoit toujours un vieu SocketTimeOutException que je ne comprends pas (aucune aide...)
+                                    // Taper la même chose avec postman marche (ou alors j'ai fait une boulette?)
+                                    Car car = ((MainActivity) getActivity()).getXeeApi().getCar("43").execute().item;
+                                    AppDatabase.getAppDatabase(getContext()).tripDao().insertAll(com.nsy209.nicedriver.model.objects.Trip.convertFromXee(((MainActivity) getActivity()).getXeeApi().getTrips(car.getId()).execute().item));
+                                    AppDatabase.getAppDatabase(getContext()).signalDao().insertAll(Signal.convertFromXee(((MainActivity) getActivity()).getXeeApi().getSignals(car.getId()).execute().item));
+                                    AppDatabase.getAppDatabase(getContext()).locationDao().insertAll(Location.convertFromXee(((MainActivity) getActivity()).getXeeApi().getLocations(car.getId()).execute().item));
+                                    // Penser à aller dans les paramètres de l'appli (dans les paramètres android) et ajouter l'aurotisation d'écriture pour pouvoir écrire le fichier
+                                    // On peut l'explorer ensuite en le copiant sur un pc avec par exemple SQLite Studio
+                                    AppDatabase.exportDatabase(getContext(), "niceDriver.db");
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), "Terminé", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
                     }
 
                     public void onError(Throwable error) {
@@ -115,17 +147,18 @@ public class SettingsFragment extends Fragment {
             // Les requêtes qui suivent marcheraient si on les appelait
             ((MainActivity) getActivity()).getXeeApi().getCar("3");
             ((MainActivity) getActivity()).getXeeApi().getTrips("43");
+            ((MainActivity) getActivity()).getXeeApi().getSignals("43");
 
-            return userXeeRequest.execute();
+            return ((MainActivity) getActivity()).getXeeApi().getCar("43").execute();
         }
 
         @Override
         protected void onPostExecute(XeeRequest.Response response) {
             if (response.error != null) {
-                showResult("getUser", response.error, false);
+                showResult("getCar", response.error, false);
                 return;
             }
-            showResult("getUser", response, true);
+            showResult("getCar", response, true);
         }
     }
 
