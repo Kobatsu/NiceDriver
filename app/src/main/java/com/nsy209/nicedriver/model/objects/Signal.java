@@ -3,6 +3,8 @@ package com.nsy209.nicedriver.model.objects;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,10 +15,13 @@ import java.util.List;
 @Entity(tableName = "Signals", primaryKeys = {"date", "value", "name"})
 public class Signal {
     @ColumnInfo(name = "date")
+    @SerializedName("date")
     private Date mDate;
     @ColumnInfo(name = "value")
+    @SerializedName("value")
     private double mValue;
     @ColumnInfo(name = "name")
+    @SerializedName("name")
     private String mName;
 
     public Date getDate() {

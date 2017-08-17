@@ -3,6 +3,7 @@ package com.nsy209.nicedriver.model.dao;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
 
 import com.nsy209.nicedriver.model.objects.Location;
 
@@ -16,4 +17,7 @@ public interface LocationDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insertAll(List<Location> trips);
+
+    @Query("SELECT * FROM Locations")
+    public List<Location> getAll();
 }

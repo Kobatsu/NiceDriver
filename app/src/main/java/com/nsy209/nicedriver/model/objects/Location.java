@@ -3,6 +3,8 @@ package com.nsy209.nicedriver.model.objects;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,16 +15,22 @@ import java.util.List;
 @Entity(tableName = "Locations", primaryKeys = {"latitude", "longitude", "altitude", "heading", "satellites", "date"})
 public class Location {
     @ColumnInfo(name = "latitude")
+    @SerializedName("latitude")
     private double mLatitude;
     @ColumnInfo(name = "longitude")
+    @SerializedName("longitude")
     private double mLongitude;
     @ColumnInfo(name = "altitude")
+    @SerializedName("altitude")
     private double mAltitude;
     @ColumnInfo(name = "heading")
+    @SerializedName("heading")
     private double mHeading;
     @ColumnInfo(name = "satellites")
+    @SerializedName("satellites")
     private int mSatellites;
     @ColumnInfo(name = "date")
+    @SerializedName("date")
     private Date mDate;
 
     public double getLatitude() {
