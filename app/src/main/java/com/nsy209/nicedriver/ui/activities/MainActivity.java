@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final Call<List<PointCalcul>> call =ApiSingleton.getNiceDriverInstance().getCalculatedPoints(
+                final Call<List<PointCalcul>> call = ApiSingleton.getNiceDriverInstance().getCalculatedPoints(
                         new BodyPointsAndSignal(AppDatabase.getAppDatabase(MainActivity.this).locationDao().getAll(),
                                 AppDatabase.getAppDatabase(MainActivity.this).signalDao().getAll()));
 
@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<List<PointCalcul>> call, Response<List<PointCalcul>> response) {
                                 Log.d("RestCALL", "ok");
+                                List<PointCalcul> points = response.body();
                             }
 
                             @Override

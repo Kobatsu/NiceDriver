@@ -1,5 +1,7 @@
 package com.nsy209.nicedriver.model.objects;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -7,7 +9,9 @@ import java.util.List;
  */
 
 public class BodyPointsAndSignal {
+    @SerializedName("locations")
     private List<Location> mLocations;
+    @SerializedName("signals")
     private List<Signal> mSignals;
 
     public BodyPointsAndSignal(List<Location> locations, List<Signal> signals) {

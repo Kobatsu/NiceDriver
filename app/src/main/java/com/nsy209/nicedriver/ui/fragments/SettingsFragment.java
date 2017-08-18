@@ -21,10 +21,10 @@ import com.nsy209.nicedriver.ui.activities.MainActivity;
 import com.nsy209.nicedriver.utils.JSonLogger;
 import com.xee.api.Xee;
 import com.xee.api.entity.Car;
-import com.xee.api.entity.User;
 import com.xee.auth.ConnectionCallback;
 import com.xee.auth.SignInButton;
 import com.xee.core.XeeRequest;
+import com.xee.core.entity.Error;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -86,6 +86,26 @@ public class SettingsFragment extends Fragment {
                         Log.d("Xee", "Connection OK");
                         //debug purpose
                         new GetUserTask().execute();
+                        ((MainActivity) getActivity()).getXeeApi().getCar("43").enqueue(new XeeRequest.Callback<Car>() {
+                            @Override
+                            public void onSuccess(Car car) {
+                                try {
+                                    Log.d("Xee", "Car ok");
+                                    AppDatabase.getAppDatabase(getContext()).tripDao().insertAll(com.nsy209.nicedriver.model.objects.Trip.convertFromXee(((MainActivity) getActivity()).getXeeApi().getTrips(car.getId()).execute().item));
+                                    AppDatabase.getAppDatabase(getContext()).signalDao().insertAll(Signal.convertFromXee(((MainActivity) getActivity()).getXeeApi().getSignals(car.getId()).execute().item));
+                                    AppDatabase.getAppDatabase(getContext()).locationDao().insertAll(Location.convertFromXee(((MainActivity) getActivity()).getXeeApi().getLocations(car.getId()).execute().item));
+                                    Log.d("Xee", "All ok");
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Error error) {
+                                Log.d("Xee", "onError");
+                            }
+                        });
+
 
                         new Thread(new Runnable() {
                             @Override
@@ -142,14 +162,24 @@ public class SettingsFragment extends Fragment {
             // Même pas du JSON, impossible de voir ce que c'est, grosse galère.. J'ai du aller en
             // debug, chercher userXeeRequest.delegate.serviceMethod.relativeUrl pour comprendre
             // quelle url ça tapait, et tester dans postman...
-            XeeRequest<User> userXeeRequest = ((MainActivity) getActivity()).getXeeApi().getUser();
+//            XeeRequest<User> userXeeRequest = ((MainActivity) getActivity()).getXeeApi().getUser();
 
             // Les requêtes qui suivent marcheraient si on les appelait
-            ((MainActivity) getActivity()).getXeeApi().getCar("3");
-            ((MainActivity) getActivity()).getXeeApi().getTrips("43");
-            ((MainActivity) getActivity()).getXeeApi().getSignals("43");
+//            ((MainActivity) getActivity()).getXeeApi().getCar("3");
+//            ((MainActivity) getActivity()).getXeeApi().getTrips("43");
+//            ((MainActivity) getActivity()).getXeeApi().getSignals("43");
+
+
+//            Car car = ((MainActivity) getActivity()).getXeeApi().getCar("43").execute().item;
+//            AppDatabase.getAppDatabase(getContext()).tripDao().insertAll(com.nsy209.nicedriver.model.objects.Trip.convertFromXee(((MainActivity) getActivity()).getXeeApi().getTrips(car.getId()).execute().item));
+//            AppDatabase.getAppDatabase(getContext()).signalDao().insertAll(Signal.convertFromXee(((MainActivity) getActivity()).getXeeApi().getSignals(car.getId()).execute().item));
+//            AppDatabase.getAppDatabase(getContext()).locationDao().insertAll(Location.convertFromXee(((MainActivity) getActivity()).getXeeApi().getLocations(car.getId()).execute().item));
+//            // Penser à aller dans les paramètres de l'appli (dans les paramètres android) et ajouter l'aurotisation d'écriture pour pouvoir écrire le fichier
+//            // On peut l'explorer ensuite en le copiant sur un pc avec par exemple SQLite Studio
+//            AppDatabase.exportDatabase(getContext(), "niceDriver.db");
 
             return ((MainActivity) getActivity()).getXeeApi().getCar("43").execute();
+
         }
 
         @Override
