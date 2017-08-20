@@ -11,9 +11,4 @@
         android:icon="@drawable/ic_format_list_bulleted_black_24dp"
         android:title="@string/title_path" />
 
-    <item
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/title_settings" />
-
 </menu>

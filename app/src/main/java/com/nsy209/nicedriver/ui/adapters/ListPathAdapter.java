@@ -6,10 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.nsy209.nicedriver.R;
 import com.nsy209.nicedriver.model.objects.Path;
+import com.nsy209.nicedriver.ui.activities.MainActivity;
+import com.nsy209.nicedriver.utils.DateUtils;
+import com.nsy209.nicedriver.utils.GeoUtils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -20,26 +24,12 @@ import butterknife.ButterKnife;
 
 public class ListPathAdapter extends RecyclerView.Adapter<ListPathAdapter.PathHolder> {
 
-    private final ArrayList<Path> mList;
+    private final List<Path> mList;
+    private final MainActivity mMainActivity;
 
-    public ListPathAdapter() {
-        mList = new ArrayList<>();
-        mList.add(new Path("6 avenue Saint-Granier, Toulouse", "13/07/2017 13:20",
-                "5 rue du Pêcheur, Toulouse", "13/07/2017 13h42",
-                "12 km", "22 min"));
-        mList.add(new Path("7 avenue Saint-Granier, Toulouse", "14/07/2017 15:20",
-                "12 rue du Rosier, Toulouse", "13/07/2017 15h40",
-                "12 km", "22 min"));
-        mList.add(new Path("6 avenue Pompidou, Perigueux", "15/07/2017 08:20",
-                "8 avenue Saint-Martin, Toulouse", "13/07/2017 11h35",
-                "256 km", "3h15"));
-        mList.add(new Path("4 route de Grenade, Blagnac", "13/07/2017 14:20",
-                "37 rue de Zarowski, Toulouse", "13/07/2017 15h03",
-                "24 km", "43 min"));
-        mList.add(new Path("6 avenue Saint-Granier, Toulouse", "13/07/2017 16:20",
-                "42 route de Mendes, Toulouse", "13/07/2017 16h47",
-                "15 km", "27 min"));
-
+    public ListPathAdapter(final MainActivity mainActivity, List<Path> list) {
+        mMainActivity = mainActivity;
+        mList = list;
     }
 
     @Override
@@ -51,19 +41,33 @@ public class ListPathAdapter extends RecyclerView.Adapter<ListPathAdapter.PathHo
 
     @Override
     public void onBindViewHolder(PathHolder pathHolder, int i) {
-        Path path = mList.get(pathHolder.getLayoutPosition());
+        final Path path = mList.get(pathHolder.getLayoutPosition());
 
-        pathHolder.startAdress.setText(path.getStartAdress());
-        pathHolder.startDate.setText(path.getStartDate());
-        pathHolder.endAdress.setText(path.getEndAdress());
-        pathHolder.endDate.setText(path.getEndDate());
-        pathHolder.distance.setText(path.getDistance());
-        pathHolder.time.setText(path.getTime());
+        pathHolder.startAdress.setText(GeoUtils.printAddress(path.getStartAddress()));
+        pathHolder.startDate.setText(DateUtils.formatDate(path.getStartDate()));
+        pathHolder.endAdress.setText(GeoUtils.printAddress(path.getEndAddress()));
+        pathHolder.endDate.setText(DateUtils.formatDate(path.getEndDate()));
+        pathHolder.distance.setText(GeoUtils.printDistance(GeoUtils.distanceInMeters(new LatLng(path.getStartAddress().getLatitude(),
+                path.getStartAddress().getLongitude()), path.getStartAltitude(), new LatLng(path.getEndAddress().getLatitude(),
+                path.getEndAddress().getLongitude()),path.getEndAltitude())));
+        pathHolder.time.setText(DateUtils.formatDifference(path.getTime()));
+        pathHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMainActivity.displayTrip(path.getTrip());
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+    public void updateList(List<Path> list) {
+        mList.clear();
+        mList.addAll(list);
+        notifyDataSetChanged();
     }
 
     public static class PathHolder extends RecyclerView.ViewHolder {

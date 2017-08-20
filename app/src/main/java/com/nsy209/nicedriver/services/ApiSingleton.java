@@ -1,5 +1,11 @@
 package com.nsy209.nicedriver.services;
 
+import android.content.Context;
+
+import com.xee.api.Xee;
+import com.xee.core.XeeEnv;
+import com.xee.core.entity.OAuth2Client;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -13,6 +19,7 @@ public class ApiSingleton {
 
     private static final String API_BASE_URL = "http://vps001.matigames.com:888/NiceDriver_Serveur/rest/";
     private static NiceDriverService sInstance;
+    private static Xee xeeInstance;
 
     public static NiceDriverService getNiceDriverInstance() {
         if (sInstance == null) {
@@ -36,4 +43,22 @@ public class ApiSingleton {
         }
         return sInstance;
     }
+
+    public static Xee getXeeApi() {
+        if (xeeInstance != null) {
+            return xeeInstance;
+        } else {
+            throw new RuntimeException("Call initXeeApi() first");
+        }
+    }
+
+    public static void initXeeApi(Context context) {
+        XeeEnv xeeEnv = new XeeEnv(context,
+                new OAuth2Client("tpziqAm4itmcCUlc6azs",
+                        "TH2tFMi0KTXSyBUBGvJ9",
+                        "http://localhost"),
+                60, 60, XeeEnv.SANDBOX);
+        xeeInstance = new Xee(xeeEnv);
+    }
+
 }

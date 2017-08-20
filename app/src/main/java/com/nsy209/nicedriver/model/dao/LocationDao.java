@@ -20,4 +20,8 @@ public interface LocationDao {
 
     @Query("SELECT * FROM Locations")
     public List<Location> getAll();
+
+    @Query("SELECT * FROM Locations\n" +
+            "WHERE date >= :timeStart AND date <= :timeEnd")
+    public List<Location> getByTrip(long timeStart, long timeEnd);
 }

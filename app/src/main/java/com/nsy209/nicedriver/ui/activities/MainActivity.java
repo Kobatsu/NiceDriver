@@ -1,29 +1,27 @@
 package com.nsy209.nicedriver.ui.activities;
 
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import com.nsy209.nicedriver.R;
 import com.nsy209.nicedriver.model.AppDatabase;
 import com.nsy209.nicedriver.model.objects.BodyPointsAndSignal;
 import com.nsy209.nicedriver.model.objects.PointCalcul;
+import com.nsy209.nicedriver.model.objects.Trip;
 import com.nsy209.nicedriver.services.ApiSingleton;
 import com.nsy209.nicedriver.ui.fragments.ListPathFragment;
 import com.nsy209.nicedriver.ui.fragments.MapFragment;
-import com.nsy209.nicedriver.ui.fragments.SettingsFragment;
 import com.xee.api.Xee;
-import com.xee.core.XeeEnv;
-import com.xee.core.entity.OAuth2Client;
 
 import java.util.List;
 
@@ -36,11 +34,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final int NB_FRAGMENTS = 3;
     private static final int FRAGMENT_MAP = 0;
     private static final int FRAGMENT_LIST = 1;
-    private static final int FRAGMENT_SETTINGS = 2;
     private static final String TAG = MainActivity.class.getName().substring(MainActivity.class.getName().lastIndexOf("."));
+    public static final String USER_TYPE = "USER_TYPE";
+    public static final String TYPE_DRIVER = "TYPE_DRIVER";
+    public static final String TYPE_ADMIN = "TYPE_ADMIN";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -54,9 +53,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_dashboard:
                     mViewPager.setCurrentItem(1);
                     return true;
-                case R.id.navigation_notifications:
-                    mViewPager.setCurrentItem(2);
-                    return true;
             }
             return false;
         }
@@ -69,15 +65,24 @@ public class MainActivity extends AppCompatActivity {
     private ViewPagerAdapter mViewPagerAdapter;
     private MenuItem mPrevMenuItem;
     private Xee mXeeApi;
+    private String mTypeUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mTypeUser = PreferenceManager.getDefaultSharedPreferences(this).getString(USER_TYPE, TYPE_DRIVER);
 
         ButterKnife.bind(this);
         mBottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        if (mTypeUser.equals(TYPE_ADMIN)) {
+            mBottomNavigation.setVisibility(View.GONE);
+        } else {
+            mBottomNavigation.setVisibility(View.VISIBLE);
+        }
+
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -104,8 +109,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        initXee();
-        testRestCall();
     }
 
     private void testRestCall() {
@@ -123,7 +126,12 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<List<PointCalcul>> call, Response<List<PointCalcul>> response) {
                                 Log.d("RestCALL", "ok");
-                                List<PointCalcul> points = response.body();
+                                try {
+                                    List<PointCalcul> points = response.body();
+                                    Log.d("RestCALL","Points : " + points);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                             @Override
@@ -135,50 +143,25 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         }).start();
-
-
-    }
-
-    private void initXee() {
-        XeeEnv xeeEnv = new XeeEnv(this,
-                new OAuth2Client("tpziqAm4itmcCUlc6azs",
-                        "TH2tFMi0KTXSyBUBGvJ9",
-                        "http://localhost"),
-                60, 60, XeeEnv.SANDBOX);
-        mXeeApi = new Xee(xeeEnv);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        testRestCall();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case MapFragment.REQUEST_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    ((MapFragment) mViewPagerAdapter.getItem(0)).initMap();
-                } else {
-                    Toast.makeText(this, getString(R.string.access_location_needed), Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-
+    public void displayTrip(Trip trip) {
+        ((MapFragment) mViewPagerAdapter.getActiveFragment(mViewPager, FRAGMENT_MAP)).drawTrip(trip);
+        mViewPager.setCurrentItem(FRAGMENT_MAP);
     }
 
-    public Xee getXeeApi() {
-        return mXeeApi;
-    }
 
     /**
      * A simple pager adapter that represents 3 fragments corresponding to each button of the
      * bottomNavigationView
      */
-    private class ViewPagerAdapter extends FragmentStatePagerAdapter {
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
         public ViewPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -190,15 +173,26 @@ public class MainActivity extends AppCompatActivity {
                     return MapFragment.newInstance();
                 case FRAGMENT_LIST:
                     return ListPathFragment.newInstance();
-                case FRAGMENT_SETTINGS:
-                    return SettingsFragment.newInstance();
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return NB_FRAGMENTS;
+            if (mTypeUser.equals(TYPE_DRIVER)) {
+                return 2;
+            } else {
+                return 1;
+            }
+        }
+
+        public Fragment getActiveFragment(ViewPager container, int position) {
+            String name = makeFragmentName(container.getId(), position);
+            return getSupportFragmentManager().findFragmentByTag(name);
+        }
+
+        private String makeFragmentName(int viewId, int index) {
+            return "android:switcher:" + viewId + ":" + index;
         }
     }
 }

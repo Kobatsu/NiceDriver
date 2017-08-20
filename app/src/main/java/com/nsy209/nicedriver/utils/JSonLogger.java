@@ -1,5 +1,10 @@
 package com.nsy209.nicedriver.utils;
 
+import android.app.AlertDialog;
+import android.content.Context;
+
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,5 +37,19 @@ public class JSonLogger {
         }
 
         return json;
+    }
+
+    /**
+     * Show the json response (one the right part)
+     *
+     * @param caller    the caller (web service name)
+     * @param data      the data response
+     * @param isSuccess true if response is successful, otherwise false
+     */
+    public static void showResult(Context context, String caller, Object data, boolean isSuccess) {
+        Gson gson = new Gson();
+        String json = gson.toJson(data);
+        final String prettyResult = JSonLogger.getPrettyLog(json);
+        new AlertDialog.Builder(context).setTitle(caller).setMessage(prettyResult).show();
     }
 }

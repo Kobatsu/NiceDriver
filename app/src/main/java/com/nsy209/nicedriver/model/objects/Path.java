@@ -1,83 +1,107 @@
 package com.nsy209.nicedriver.model.objects;
 
+import android.location.Address;
+
+import java.util.Date;
+
 /**
  * Created by Sébastien on 13/07/2017.
  */
 
 public class Path {
-    private String mStartAdress;
-    private String mStartDate;
-    private String mEndAdress;
-    private String mEndDate;
-    private String mDistance;
-    private String mTime;
+    private final Trip mTrip;
+    private Address mStartAddress;
+    private Address mEndAddress;
+    private double mStartAltitude;
+    private double mEndAltitude;
+    private double mDistance;
+    private Date mStartDate;
+    private Date mEndDate;
+    private long mTime;
 
-    public Path(String mStartAdress, String mStartDate, String mEndAdress, String mEndDate, String mDistance, String mTime) {
-        this.mStartAdress = mStartAdress;
-        this.mStartDate = mStartDate;
-        this.mEndAdress = mEndAdress;
-        this.mEndDate = mEndDate;
-        this.mDistance = mDistance;
-        this.mTime = mTime;
+    public Path(Trip trip) {
+        mTrip = trip;
     }
 
-    public String getStartAdress() {
-        return mStartAdress;
+    public Address getStartAddress() {
+        return mStartAddress;
     }
 
-    public void setStartAdress(String startAdress) {
-        mStartAdress = startAdress;
+    public void setStartAddress(Address startAddress) {
+        mStartAddress = startAddress;
     }
 
-    public String getStartDate() {
-        return mStartDate;
+    public Address getEndAddress() {
+        return mEndAddress;
     }
 
-    public void setStartDate(String startDate) {
-        mStartDate = startDate;
+    public void setEndAddress(Address endAddress) {
+        mEndAddress = endAddress;
     }
 
-    public String getEndAdress() {
-        return mEndAdress;
+    public double getStartAltitude() {
+        return mStartAltitude;
     }
 
-    public void setEndAdress(String endAdress) {
-        mEndAdress = endAdress;
+    public void setStartAltitude(double startAltitude) {
+        mStartAltitude = startAltitude;
     }
 
-    public String getEndDate() {
-        return mEndDate;
+    public double getEndAltitude() {
+        return mEndAltitude;
     }
 
-    public void setEndDate(String endDate) {
-        mEndDate = endDate;
+    public void setEndAltitude(double endAltitude) {
+        mEndAltitude = endAltitude;
     }
 
-    public String getDistance() {
+    public double getDistance() {
         return mDistance;
     }
 
-    public void setDistance(String distance) {
+    public void setDistance(double distance) {
         mDistance = distance;
     }
 
-    public String getTime() {
+    public Date getStartDate() {
+        return mStartDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        mStartDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return mEndDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        mEndDate = endDate;
+    }
+
+    public long getTime() {
         return mTime;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         mTime = time;
+    }
+
+    public Trip getTrip() {
+        return mTrip;
     }
 
     @Override
     public String toString() {
         return "Path{" +
-                "mStartAdress='" + mStartAdress + '\'' +
-                ", mStartDate='" + mStartDate + '\'' +
-                ", mEndAdress='" + mEndAdress + '\'' +
-                ", mEndDate='" + mEndDate + '\'' +
-                ", mDistance='" + mDistance + '\'' +
-                ", mTime='" + mTime + '\'' +
+                "mStartAddress=" + mStartAddress +
+                ", mEndAddress=" + mEndAddress +
+                ", mStartAltitude=" + mStartAltitude +
+                ", mEndAltitude=" + mEndAltitude +
+                ", mDistance=" + mDistance +
+                ", mStartDate=" + mStartDate +
+                ", mEndDate=" + mEndDate +
+                ", mTime=" + mTime +
                 '}';
     }
 }

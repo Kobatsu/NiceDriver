@@ -5,19 +5,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.nsy209.nicedriver.ui.fragments.SettingsFragment">
+    tools:context="com.nsy209.nicedriver.ui.fragments.UserLoginFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_settings_fragment" />
+        android:padding="16dp"
+        android:text="@string/connect_to_start" />
+
 
     <com.xee.auth.SignInButton
+        android:layout_gravity="center"
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:signInBtnSize="normal"
         app:signInBtnTheme="green" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/go_button"
+        android:enabled="false"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="@string/go" />
 </LinearLayout>

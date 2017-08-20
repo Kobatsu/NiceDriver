@@ -2,14 +2,19 @@ package com.nsy209.nicedriver.ui.fragments;
 
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -19,7 +24,17 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.nsy209.nicedriver.R;
+import com.nsy209.nicedriver.model.AppDatabase;
+import com.nsy209.nicedriver.model.objects.Location;
+import com.nsy209.nicedriver.model.objects.Trip;
+import com.nsy209.nicedriver.ui.activities.LoginActivity;
+import com.nsy209.nicedriver.ui.activities.MainActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,7 +51,10 @@ public class MapFragment extends Fragment {
     private Unbinder unbinder;
     @BindView(R.id.mapView)
     MapView mMapView;
+    @BindView(R.id.floating_search_view)
+    FloatingSearchView mFloatingSearchView;
     private GoogleMap googleMap;
+    private Polyline mPolyline;
 
     public MapFragment() {
         // Required empty public constructor
@@ -51,37 +69,6 @@ public class MapFragment extends Fragment {
     public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-//
-//        Geocoder geocoder;
-//        List<Address> addresses;
-//        geocoder = new Geocoder(getContext(), Locale.getDefault());
-//
-//        try {
-//            addresses = geocoder.getFromLocation(50.68152, 3.082152, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-//
-//            String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-//            String city = addresses.get(0).getLocality();
-//            String state = addresses.get(0).getAdminArea();
-//            String country = addresses.get(0).getCountryName();
-//            String postalCode = addresses.get(0).getPostalCode();
-//            String knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
-//
-//            Log.d("LocationTest", "address : " + address);
-//            Log.d("LocationTest", "city : " + city);
-//            Log.d("LocationTest", "state : " + state);
-//            Log.d("LocationTest", "country : " + country);
-//            Log.d("LocationTest", "postalCode : " + postalCode);
-//            Log.d("LocationTest", "knownName : " + knownName);
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -100,6 +87,19 @@ public class MapFragment extends Fragment {
         }
 
         initMap();
+        mFloatingSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
+            @Override
+            public void onActionMenuItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.action_disconnect:
+                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().remove(MainActivity.USER_TYPE).commit();
+                        getActivity().finish();
+                        Intent intent = new Intent(getContext(), LoginActivity.class);
+                        startActivity(intent);
+                        break;
+                }
+            }
+        });
 
         return view;
     }
@@ -126,10 +126,10 @@ public class MapFragment extends Fragment {
                     googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
 
                     // For zooming automatically to the location of the marker
-                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
+//                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));  //move camera to location
+//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));  //move camera to location
                     Marker hamburg = googleMap.addMarker(new MarkerOptions().position(sydney));
 
                     mMapView.onResume(); // needed to get the map to display immediately
@@ -142,6 +142,43 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+    }
+
+    private void drawLine(List<Location> list) {
+        if (mPolyline != null) {
+            mPolyline.remove();
+        }
+        List<LatLng> points = null;
+        PolylineOptions lineOptions = null;
+        MarkerOptions markerOptions = new MarkerOptions();
+
+        // Traversing through all the routes
+        points = new ArrayList<LatLng>();
+
+        lineOptions = new PolylineOptions();
+
+        for (Location l : list) {
+
+            double lat = l.getLatitude();
+            double lng = l.getLongitude();
+            LatLng position = new LatLng(lat, lng);
+
+            points.add(position);
+        }
+        // Adding all the points in the route to LineOptions
+        lineOptions.addAll(points);
+        lineOptions.width(8);
+        lineOptions.color(Color.RED);
+
+
+        // Drawing polyline in the Google Map for the i-th route
+        mPolyline = googleMap.addPolyline(lineOptions);
+
+        LatLng start = new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude());
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(start).zoom(12).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 15));  //move camera to location
+
     }
 
     @Override
@@ -166,5 +203,21 @@ public class MapFragment extends Fragment {
         mMapView.onDestroy();
         unbinder.unbind();
         super.onDestroyView();
+    }
+
+    public void drawTrip(final Trip trip) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<Location> locations = AppDatabase.getAppDatabase(getContext()).locationDao()
+                        .getByTrip(trip.getBeginDate().getTime(), trip.getEndDate().getTime());
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        drawLine(locations);
+                    }
+                });
+            }
+        }).start();
     }
 }
