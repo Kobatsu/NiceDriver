@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <com.arlib.floatingsearchview.FloatingSearchView
         android:id="@+id/floating_search_view"
         android:layout_width="match_parent"
@@ -24,5 +25,26 @@
         app:floatingSearch_showSearchKey="false"
         app:floatingSearch_suggestionsListAnimDuration="250" />
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        app:cardUseCompatPadding="true">
+
+        <fr.ganfra.materialspinner.MaterialSpinner
+            android:id="@+id/filter_signals"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            app:ms_alignLabels="false"
+            app:ms_arrowSize="16dp"
+            app:ms_enableErrorLabel="false"
+            app:ms_enableFloatingLabel="true"
+            app:ms_floatingLabelText="Type de signal"
+            app:ms_multiline="false" />
+    </android.support.v7.widget.CardView>
 
 </FrameLayout>

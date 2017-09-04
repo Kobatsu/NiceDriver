@@ -11,7 +11,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.nsy209.nicedriver.R;
 import com.nsy209.nicedriver.model.AppDatabase;
@@ -77,11 +76,12 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mBottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        if (mTypeUser.equals(TYPE_ADMIN)) {
-            mBottomNavigation.setVisibility(View.GONE);
-        } else {
-            mBottomNavigation.setVisibility(View.VISIBLE);
-        }
+        // Bug : if bottomnavigationview gone, viewpager can"t be above
+//        if (mTypeUser.equals(TYPE_ADMIN)) {
+//            mBottomNavigation.setVisibility(View.GONE);
+//        } else {
+//            mBottomNavigation.setVisibility(View.VISIBLE);
+//        }
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mViewPagerAdapter);
@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void testRestCall() {
@@ -128,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("RestCALL", "ok");
                                 try {
                                     List<PointCalcul> points = response.body();
-                                    Log.d("RestCALL","Points : " + points);
+                                    Log.d("RestCALL", "Points : " + points);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -148,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        testRestCall();
+//        testRestCall();
+        mViewPager.setCurrentItem(0);
+        AppDatabase.exportDatabase(this, "nice-driver-database.db");
     }
 
     public void displayTrip(Trip trip) {

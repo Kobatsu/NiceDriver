@@ -35,21 +35,21 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.0.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation 'com.android.support:design:26.0.0'
-    implementation 'com.google.android.gms:play-services-maps:10.2.1'
-    implementation 'com.android.support:support-vector-drawable:26.0.0'
+    implementation 'com.android.support:design:26.0.2'
+    implementation 'com.google.android.gms:play-services-maps:11.2.0'
+    implementation 'com.android.support:support-vector-drawable:26.0.2'
 
     //Butterknife
     implementation 'com.jakewharton:butterknife:8.7.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
-    implementation 'com.android.support:support-v4:26.0.0'
+    implementation 'com.android.support:support-v4:26.0.2'
 
     //Floating SearchView https://github.com/arimorty/floatingsearchview
     compile 'com.github.arimorty:floatingsearchview:2.1.1'
 
     //ORM
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha8"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha8"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha9"
+    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha9"
 
     //Xee
     compile 'com.github.xee-lab.xee-sdk-android:sdk-core:3.3.1'
@@ -60,5 +60,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
+    compile 'com.github.ganfra:material-spinner:1.1.1'
 
 }

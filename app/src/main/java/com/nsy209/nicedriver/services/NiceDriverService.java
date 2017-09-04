@@ -12,12 +12,16 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * Created by Sébastien on 17/08/2017.
  */
 
 public interface NiceDriverService {
+
+    @GET("points/{signal}")
+    Call<List<PointCalcul>> getCalculatedPoints(@Path("signal") String signal);
 
     @POST("points")
     Call<List<PointCalcul>> getCalculatedPoints(@Body BodyPointsAndSignal user);

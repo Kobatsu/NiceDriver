@@ -4,15 +4,23 @@ package com.nsy209.nicedriver.ui.fragments;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,18 +28,21 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.nsy209.nicedriver.R;
 import com.nsy209.nicedriver.model.AppDatabase;
 import com.nsy209.nicedriver.model.objects.Location;
+import com.nsy209.nicedriver.model.objects.PointCalcul;
 import com.nsy209.nicedriver.model.objects.Trip;
+import com.nsy209.nicedriver.services.ApiSingleton;
 import com.nsy209.nicedriver.ui.activities.LoginActivity;
-import com.nsy209.nicedriver.ui.activities.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +50,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.nsy209.nicedriver.ui.activities.MainActivity.TYPE_DRIVER;
+import static com.nsy209.nicedriver.ui.activities.MainActivity.USER_TYPE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,8 +70,12 @@ public class MapFragment extends Fragment {
     MapView mMapView;
     @BindView(R.id.floating_search_view)
     FloatingSearchView mFloatingSearchView;
+    @BindView(R.id.filter_signals)
+    fr.ganfra.materialspinner.MaterialSpinner mSpinner;
+
     private GoogleMap googleMap;
     private Polyline mPolyline;
+    private List<PointCalcul> mPointsCalculated;
 
     public MapFragment() {
         // Required empty public constructor
@@ -92,16 +113,78 @@ public class MapFragment extends Fragment {
             public void onActionMenuItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.action_disconnect:
-                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().remove(MainActivity.USER_TYPE).commit();
+                        PreferenceManager.getDefaultSharedPreferences(getContext()).edit().remove(USER_TYPE).commit();
                         getActivity().finish();
                         Intent intent = new Intent(getContext(), LoginActivity.class);
                         startActivity(intent);
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                final List<Location> list = AppDatabase.getAppDatabase(getContext()).locationDao().getAll();
+//                                getActivity().runOnUiThread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        showTestPoints(list);
+//                                    }
+//                                });
+//                            }
+//                        }).start();
                         break;
                 }
             }
         });
 
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
+                AppDatabase.getAppDatabase(getContext()).signalDao().getTypes());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (i >= 0) {
+                    Toast.makeText(getContext(), "Item clicked " + adapter.getItem(i), Toast.LENGTH_SHORT).show();
+                    // make the query either on database if user connected or on cloud if not
+                    showPointsSignal(adapter.getItem(i));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         return view;
+    }
+
+    private void showPointsSignal(String item) {
+        if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(USER_TYPE, TYPE_DRIVER).equals(TYPE_DRIVER)) {
+            // get signals in database
+            List<PointCalcul> pointCalculs = AppDatabase.getAppDatabase(getContext()).pointCalculDao().getPoints(item);
+            addMarkers(pointCalculs);
+        } else {
+            // get signals from the cloud
+            final Call<List<PointCalcul>> call = ApiSingleton.getNiceDriverInstance().getCalculatedPoints(item);
+
+            call.enqueue(new Callback<List<PointCalcul>>() {
+                @Override
+                public void onResponse(Call<List<PointCalcul>> call, Response<List<PointCalcul>> response) {
+                    Log.d("getSignalAdmin", "ok");
+                    try {
+                        List<PointCalcul> points = response.body();
+                        addMarkers(points);
+                        Log.d("getSignalAdmin", "Points : " + points);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<PointCalcul>> call, Throwable t) {
+                    Log.d("getSignalAdmin", "fail");
+                }
+            });
+        }
     }
 
     public void initMap() {
@@ -123,14 +206,14 @@ public class MapFragment extends Fragment {
 
                     // For dropping a marker at a point on the Map
                     LatLng sydney = new LatLng(43.556606, 1.465789);
-                    googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
+//                    googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
 
                     // For zooming automatically to the location of the marker
-//                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-//                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
 //                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));  //move camera to location
-                    Marker hamburg = googleMap.addMarker(new MarkerOptions().position(sydney));
+//                    Marker hamburg = googleMap.addMarker(new MarkerOptions().position(sydney));
 
                     mMapView.onResume(); // needed to get the map to display immediately
                 }
@@ -179,17 +262,40 @@ public class MapFragment extends Fragment {
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 15));  //move camera to location
 
+//        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+//            @Override
+//            public void onCameraIdle() {
+//                // Cleaning all the markers.
+//                if (googleMap != null) {
+//                    googleMap.clear();
+//                }
+//
+////                mPosition = mGoogleMap.getCameraPosition().target;
+////                mZoom = mGoogleMap.getCameraPosition().zoom;
+//
+//                if (mPointsCalculated != null) {
+//                    addMarkers(mPointsCalculated);
+//                }
+//            }
+//        });
+    }
+
+    private void addMarkers(List<PointCalcul> pointsCalculated) {
+        final LatLngBounds screenBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+        BitmapDescriptor icon = getMarkerIconFromDrawable(ContextCompat.getDrawable(getContext(),
+                R.drawable.custom_marker));
+        for (PointCalcul point : pointsCalculated) {
+            LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+            if (screenBounds.contains(latLng)) {
+                googleMap.addMarker(new MarkerOptions().position(latLng).icon(icon));
+            }
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mMapView.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -219,5 +325,30 @@ public class MapFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    public void showPoints(List<PointCalcul> points) {
+        addMarkers(mPointsCalculated = points);
+    }
+
+    public void showTestPoints(List<Location> locations) {
+        final LatLngBounds screenBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+        BitmapDescriptor icon = getMarkerIconFromDrawable(ContextCompat.getDrawable(getContext(),
+                R.drawable.custom_marker));
+        for (Location point : locations) {
+            LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+            if (screenBounds.contains(latLng)) {
+                googleMap.addMarker(new MarkerOptions().position(latLng).icon(icon));
+            }
+        }
+    }
+
+    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }
