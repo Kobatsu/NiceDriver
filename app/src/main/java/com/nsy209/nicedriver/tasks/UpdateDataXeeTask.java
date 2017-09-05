@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Sébastien on 31/08/2017.
@@ -64,39 +62,24 @@ public class UpdateDataXeeTask extends AsyncTask<Void, Void, Boolean> {
 
 
         try {
-            List<Signal> listTem = ApiSingleton.getNiceDriverInstance().getSignals()
-                    .execute().body();
-            Log.d("ListTemp",
-                    "ListTemp : " + listTem + (listTem == null ? 0 : listTem.size()));
-            AppDatabase.getAppDatabase(mContext).signalDao()
-                    .insertAll(listTem);
+            List<Signal> listTem = ApiSingleton.getNiceDriverInstance().getSignals().execute().body();
+            Log.d("ListTemp","ListTemp : " + listTem + (listTem == null ? 0 : listTem.size()));
+            AppDatabase.getAppDatabase(mContext).signalDao().insertAll(listTem);
             Log.d("InsertedInDb", "Signals : " + AppDatabase.getAppDatabase(mContext).signalDao().getAll());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        final Call<List<PointCalcul>> call = ApiSingleton.getNiceDriverInstance().getCalculatedPoints(
-                new BodyPointsAndSignal(AppDatabase.getAppDatabase(mContext).locationDao().getAll(),
-                        AppDatabase.getAppDatabase(mContext).signalDao().getAll()));
 
-        call.enqueue(new Callback<List<PointCalcul>>() {
-            @Override
-            public void onResponse(Call<List<PointCalcul>> call, Response<List<PointCalcul>> response) {
-                Log.d("RestCALL", "ok");
-                try {
-                    List<PointCalcul> points = response.body();
-                    AppDatabase.getAppDatabase(mContext).pointCalculDao().insertAll(points);
-                    Log.d("RestCALL", "Points : " + points.size());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<PointCalcul>> call, Throwable t) {
-                Log.d("RestCALL", "fail");
-            }
-        });
+        try {
+            List<PointCalcul> points = ApiSingleton.getNiceDriverInstance().getCalculatedPoints(
+                    new BodyPointsAndSignal(AppDatabase.getAppDatabase(mContext).locationDao().getAll(),
+                            AppDatabase.getAppDatabase(mContext).signalDao().getAll())).execute().body();
+            AppDatabase.getAppDatabase(mContext).pointCalculDao().insertAll(points);
+            Log.d("RestCALL", "Points : " + points.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }

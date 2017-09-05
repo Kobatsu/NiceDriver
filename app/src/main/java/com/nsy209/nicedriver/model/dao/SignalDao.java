@@ -23,5 +23,5 @@ public interface SignalDao {
     public List<Signal> getAll();
 
     @Query("SELECT DISTINCT name FROM Signals")
-    String[] getTypes();
+    List<String> getTypes();
 }

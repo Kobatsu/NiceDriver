@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -76,6 +77,7 @@ public class MapFragment extends Fragment {
     private GoogleMap googleMap;
     private Polyline mPolyline;
     private List<PointCalcul> mPointsCalculated;
+    private ArrayList<Marker> mMarkers;
 
     public MapFragment() {
         // Required empty public constructor
@@ -117,34 +119,25 @@ public class MapFragment extends Fragment {
                         getActivity().finish();
                         Intent intent = new Intent(getContext(), LoginActivity.class);
                         startActivity(intent);
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                final List<Location> list = AppDatabase.getAppDatabase(getContext()).locationDao().getAll();
-//                                getActivity().runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        showTestPoints(list);
-//                                    }
-//                                });
-//                            }
-//                        }).start();
                         break;
                 }
             }
         });
-
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
-                AppDatabase.getAppDatabase(getContext()).signalDao().getTypes());
+        List<String> types = AppDatabase.getAppDatabase(getContext()).signalDao().getTypes();
+        types.add(0, getString(R.string.signal_type));
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, types);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(adapter);
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (i >= 0) {
+                if (i > 0) {
                     Toast.makeText(getContext(), "Item clicked " + adapter.getItem(i), Toast.LENGTH_SHORT).show();
                     // make the query either on database if user connected or on cloud if not
                     showPointsSignal(adapter.getItem(i));
+                } else {
+                    removePoints();
                 }
             }
 
@@ -155,6 +148,15 @@ public class MapFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void removePoints() {
+        if (mMarkers != null && !mMarkers.isEmpty()) {
+            for (Marker p : mMarkers) {
+                p.remove();
+            }
+            mMarkers.clear();
+        }
     }
 
     private void showPointsSignal(String item) {
@@ -203,17 +205,26 @@ public class MapFragment extends Fragment {
 
                 } else {
                     googleMap.setMyLocationEnabled(true);
-
-                    // For dropping a marker at a point on the Map
-                    LatLng sydney = new LatLng(43.556606, 1.465789);
-//                    googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
+                    // CNAM
+//                    LatLng point = new LatLng(43.556606, 1.465789);
+                    // Path Xee
+                    LatLng point = new LatLng(50.681887, 3.12807);
 
                     // For zooming automatically to the location of the marker
-                    CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(point).zoom(11).build();
                     googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));  //move camera to location
-//                    Marker hamburg = googleMap.addMarker(new MarkerOptions().position(sydney));
+//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));  //move camera to location
+//                    Marker hamburg = googleMap.addMarker(new MarkerOptions().position(point));
+
+                    googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+                        @Override
+                        public void onCameraIdle() {
+                            if (mPointsCalculated != null) {
+                                addMarkers(mPointsCalculated);
+                            }
+                        }
+                    });
 
                     mMapView.onResume(); // needed to get the map to display immediately
                 }
@@ -261,33 +272,23 @@ public class MapFragment extends Fragment {
         CameraPosition cameraPosition = new CameraPosition.Builder().target(start).zoom(12).build();
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(start, 15));  //move camera to location
-
-//        googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
-//            @Override
-//            public void onCameraIdle() {
-//                // Cleaning all the markers.
-//                if (googleMap != null) {
-//                    googleMap.clear();
-//                }
-//
-////                mPosition = mGoogleMap.getCameraPosition().target;
-////                mZoom = mGoogleMap.getCameraPosition().zoom;
-//
-//                if (mPointsCalculated != null) {
-//                    addMarkers(mPointsCalculated);
-//                }
-//            }
-//        });
     }
 
     private void addMarkers(List<PointCalcul> pointsCalculated) {
+        mPointsCalculated = pointsCalculated;
         final LatLngBounds screenBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
         BitmapDescriptor icon = getMarkerIconFromDrawable(ContextCompat.getDrawable(getContext(),
                 R.drawable.custom_marker));
+        if (mMarkers != null && !mMarkers.isEmpty()) {
+            for (Marker p : mMarkers) {
+                p.remove();
+            }
+        }
+        mMarkers = new ArrayList<>();
         for (PointCalcul point : pointsCalculated) {
             LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
             if (screenBounds.contains(latLng)) {
-                googleMap.addMarker(new MarkerOptions().position(latLng).icon(icon));
+                mMarkers.add(googleMap.addMarker(new MarkerOptions().position(latLng).icon(icon)));
             }
         }
     }
@@ -325,10 +326,6 @@ public class MapFragment extends Fragment {
                 });
             }
         }).start();
-    }
-
-    public void showPoints(List<PointCalcul> points) {
-        addMarkers(mPointsCalculated = points);
     }
 
     public void showTestPoints(List<Location> locations) {

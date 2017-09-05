@@ -43,7 +43,7 @@
             app:ms_arrowSize="16dp"
             app:ms_enableErrorLabel="false"
             app:ms_enableFloatingLabel="true"
-            app:ms_floatingLabelText="Type de signal"
+            app:ms_floatingLabelText="@string/signal_type"
             app:ms_multiline="false" />
     </android.support.v7.widget.CardView>
 
