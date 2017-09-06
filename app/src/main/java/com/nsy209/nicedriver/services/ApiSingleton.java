@@ -22,6 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiSingleton {
 
     private static final String API_BASE_URL = "http://vps001.matigames.com:888/NiceDriver_Serveur/rest/";
+    //    private static final String API_BASE_URL = "http://192.168.43.36:8080/NiceDriver_Serveur/rest/";
     private static NiceDriverService sInstance;
     private static Xee xeeInstance;
 
@@ -29,7 +30,7 @@ public class ApiSingleton {
         if (sInstance == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             // set your desired log level
-            logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
@@ -43,7 +44,9 @@ public class ApiSingleton {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(API_BASE_URL)
 //                    .addConverterFactory(GsonConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create(new GsonBuilder().registerTypeAdapter(Date.class, new DateDeserializer()).create()))
+                    .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+                            .registerTypeAdapter(Date.class, new DateDeserializer())
+                            .registerTypeAdapter(Date.class, new DateSerializer()).create()))
                     .client(httpClient.build())
                     .build();
 

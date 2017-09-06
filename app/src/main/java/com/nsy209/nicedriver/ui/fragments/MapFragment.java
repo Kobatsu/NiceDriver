@@ -20,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -78,6 +77,7 @@ public class MapFragment extends Fragment {
     private Polyline mPolyline;
     private List<PointCalcul> mPointsCalculated;
     private ArrayList<Marker> mMarkers;
+    private ArrayAdapter<String> mSpinnerAdapter;
 
     public MapFragment() {
         // Required empty public constructor
@@ -125,17 +125,17 @@ public class MapFragment extends Fragment {
         });
         List<String> types = AppDatabase.getAppDatabase(getContext()).signalDao().getTypes();
         types.add(0, getString(R.string.signal_type));
-        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+        mSpinnerAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, types);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinner.setAdapter(adapter);
+        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(mSpinnerAdapter);
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i > 0) {
-                    Toast.makeText(getContext(), "Item clicked " + adapter.getItem(i), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getContext(), "Item clicked " + mSpinnerAdapter.getItem(i), Toast.LENGTH_SHORT).show();
                     // make the query either on database if user connected or on cloud if not
-                    showPointsSignal(adapter.getItem(i));
+                    showPointsSignal(mSpinnerAdapter.getItem(i));
                 } else {
                     removePoints();
                 }
@@ -236,6 +236,16 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        resetSpinnerAdapter();
+    }
+
+    private void resetSpinnerAdapter() {
+        if (mSpinnerAdapter != null && mSpinnerAdapter.getCount() <= 1) {
+            List<String> types = AppDatabase.getAppDatabase(getContext()).signalDao().getTypes();
+            types.add(0, getString(R.string.signal_type));
+            mSpinnerAdapter.clear();
+            mSpinnerAdapter.addAll(types);
+        }
     }
 
     private void drawLine(List<Location> list) {
