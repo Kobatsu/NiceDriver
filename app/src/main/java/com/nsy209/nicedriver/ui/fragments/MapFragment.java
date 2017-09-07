@@ -207,15 +207,11 @@ public class MapFragment extends Fragment {
                     googleMap.setMyLocationEnabled(true);
                     // CNAM
 //                    LatLng point = new LatLng(43.556606, 1.465789);
-                    // Path Xee
                     LatLng point = new LatLng(50.681887, 3.12807);
 
                     // For zooming automatically to the location of the marker
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(point).zoom(11).build();
                     googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));  //move camera to location
-//                    Marker hamburg = googleMap.addMarker(new MarkerOptions().position(point));
 
                     googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
                         @Override
@@ -236,15 +232,15 @@ public class MapFragment extends Fragment {
     public void onResume() {
         super.onResume();
         mMapView.onResume();
-        resetSpinnerAdapter();
     }
 
-    private void resetSpinnerAdapter() {
+    public void resetSpinnerAdapter() {
         if (mSpinnerAdapter != null && mSpinnerAdapter.getCount() <= 1) {
             List<String> types = AppDatabase.getAppDatabase(getContext()).signalDao().getTypes();
             types.add(0, getString(R.string.signal_type));
             mSpinnerAdapter.clear();
             mSpinnerAdapter.addAll(types);
+            mSpinnerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -275,7 +271,7 @@ public class MapFragment extends Fragment {
         lineOptions.color(Color.RED);
 
 
-        // Drawing polyline in the Google Map for the i-th route
+        // Drawing polyline in the Google Map
         mPolyline = googleMap.addPolyline(lineOptions);
 
         LatLng start = new LatLng(list.get(0).getLatitude(), list.get(0).getLongitude());

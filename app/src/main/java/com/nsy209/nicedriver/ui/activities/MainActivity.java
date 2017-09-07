@@ -9,26 +9,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.nsy209.nicedriver.R;
 import com.nsy209.nicedriver.model.AppDatabase;
-import com.nsy209.nicedriver.model.objects.BodyPointsAndSignal;
-import com.nsy209.nicedriver.model.objects.PointCalcul;
 import com.nsy209.nicedriver.model.objects.Trip;
-import com.nsy209.nicedriver.services.ApiSingleton;
 import com.nsy209.nicedriver.ui.fragments.ListPathFragment;
 import com.nsy209.nicedriver.ui.fragments.MapFragment;
 import com.xee.api.Xee;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -101,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
                 mPrevMenuItem = mBottomNavigation.getMenu().getItem(i);
                 mPrevMenuItem.setChecked(true);
+                if (i == 0) {
+                    ((MapFragment) mViewPagerAdapter.getActiveFragment(mViewPager, 0)).resetSpinnerAdapter();
+                }
             }
 
             @Override
@@ -108,40 +102,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    private void testRestCall() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final Call<List<PointCalcul>> call = ApiSingleton.getNiceDriverInstance().getCalculatedPoints(
-                        new BodyPointsAndSignal(AppDatabase.getAppDatabase(MainActivity.this).locationDao().getAll(),
-                                AppDatabase.getAppDatabase(MainActivity.this).signalDao().getAll()));
-
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        call.enqueue(new Callback<List<PointCalcul>>() {
-                            @Override
-                            public void onResponse(Call<List<PointCalcul>> call, Response<List<PointCalcul>> response) {
-                                Log.d("RestCALL", "ok");
-                                try {
-                                    List<PointCalcul> points = response.body();
-                                    Log.d("RestCALL", "Points : " + points);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<List<PointCalcul>> call, Throwable t) {
-                                Log.d("RestCALL", "fail");
-                            }
-                        });
-                    }
-                });
-            }
-        }).start();
     }
 
     @Override

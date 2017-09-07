@@ -15,7 +15,7 @@ import java.util.List;
 public class Trip {
     @PrimaryKey
     @ColumnInfo(name = "id")
-    private String mId;
+        private String mId;
 
     @ColumnInfo(name = "pointBeginLatitude")
     private double mPointBeginLatitude;
